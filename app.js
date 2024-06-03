@@ -10,7 +10,8 @@ const app = Vue.createApp({
             monsterHealth: 100,
             // special attack can only be used every 3 rounds
             currentRound: 0,
-            winner: null
+            winner: null,
+            battleLogMessages: []
         };
     },
     watch: {
@@ -52,6 +53,7 @@ const app = Vue.createApp({
     },
     methods: {
         startNewGame() {
+            this.battleLogMessages = [];
             this.playerHealth = 100;
             this.monsterHealth = 100;
             this.currentRound = 0;
@@ -61,17 +63,19 @@ const app = Vue.createApp({
             this.currentRound++;
             const attackValue = getRandomValue(5, 12);
             this.monsterHealth -= attackValue;
+            this.addBattleLogMessage('player', 'attack', attackValue)
             this.attackPlayer();
         },
         attackPlayer() {
             const attackValue = getRandomValue(8, 15);
             this.playerHealth -= attackValue;
+            this.addBattleLogMessage('monster', 'attack', attackValue)
         },
         specialAttackMonster() {
             this.currentRound++;
-
             const attackValue = getRandomValue(10, 25);
             this.monsterHealth -= attackValue;
+            this.addBattleLogMessage('player', 'special-attack', attackValue)
             this.attackPlayer();
         },
         healPlayer() {
@@ -82,10 +86,18 @@ const app = Vue.createApp({
             } else {
                 this.playerHealth += healValue;
             }
+            this.addBattleLogMessage('player', 'heal', healValue);
             this.attackPlayer();
         },
         surrenderGame() {
             this.winner = 'monster';
+        },
+        addBattleLogMessage(who, what, value) {
+            this.battleLogMessages.unshift({
+                actionBy: who,
+                actionType: what,
+                actionValue: value
+            });
         }
     }
 });
